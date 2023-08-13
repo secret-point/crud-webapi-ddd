@@ -59,13 +59,8 @@ namespace WebAPI.Controllers
         //[HttpPut("{id}")]
         [HttpPut]
         [Route("UpdateEmployee")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        public async Task<IActionResult> PutEmployee(Employee employee)
         {
-            if (id != employee.EmployeeID)
-            {
-                return BadRequest();
-            }
-
             _context.Entry(employee).State = EntityState.Modified;
 
             try
@@ -74,7 +69,7 @@ namespace WebAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeExists(id))
+                if (!EmployeeExists(employee.EmployeeID))
                 {
                     return NotFound();
                 }
@@ -106,7 +101,7 @@ namespace WebAPI.Controllers
         // DELETE: api/Employee/5
         //[HttpDelete("{id}")]
         [HttpDelete]
-        [Route("DeleteEmployee")]
+        [Route("DeleteEmployee/{Id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
             if (_context.Employees == null)
@@ -127,7 +122,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("SaveFile")]
-        public JsonResult SaveFile()
+        public JsonResult SaveFile(IFormFile file)
         {
             try
             {
@@ -138,14 +133,14 @@ namespace WebAPI.Controllers
 
                 using (var stream = new FileStream(physicalPath, FileMode.Create))
                 {
-                    stream.CopyTo(stream);
+                    postedFile.CopyTo(stream);
                 }
 
                 return new JsonResult(filename);
             }
             catch (Exception)
             {
-                return new JsonResult("anonymous.png");
+                return new JsonResult("avatar.jpg");
             }
         }
         private bool EmployeeExists(int id)
